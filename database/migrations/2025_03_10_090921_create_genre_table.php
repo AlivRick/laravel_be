@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('genre_id');
             $table->string('genre_name')->unique();
             $table->text('description')->nullable();
+            $table->boolean('is_deleted')->default(false);
             $table->timestamps();
         });
     }

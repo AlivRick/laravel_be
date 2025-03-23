@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; // Thêm dòng này để sử dụng DB facade
 use App\Models\User;
 use App\Models\Role;
 
@@ -43,6 +44,11 @@ class AuthController extends Controller
             'role_id' => 'required|exists:role,role_id',
         ]);
 
+        // Kiểm tra kết nối cơ sở dữ liệu
+        if (!DB::connection()->getDatabaseName()) {
+            return response()->json(['error' => 'Could not connect to the database.'], 500);
+        }
+
         $user = new User();
         $user->username = $validatedData['username'];
         $user->email = $validatedData['email'];
@@ -57,7 +63,6 @@ class AuthController extends Controller
         $token = Auth::login($user);
         return $this->respondWithToken($token);
     }
-
     /**
      * Get the token array structure.
      *

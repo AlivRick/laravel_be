@@ -13,16 +13,23 @@ class Genre extends Model
 
     protected $fillable = [
         'genre_name',
-        'description'
+        'description',
+        'is_deleted'
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'is_deleted' => 'boolean'
     ];
 
     public function movies()
     {
         return $this->belongsToMany(Movie::class, 'moviegenre', 'genre_id', 'movie_id');
+    }
+    // Scope to get only non-deleted genres
+    public function scopeActive($query)
+    {
+        return $query->where('is_deleted', false);
     }
 }
