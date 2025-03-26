@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\SeatController;
 
 Route::group(['middleware' => 'api'], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -16,5 +17,10 @@ Route::group(['middleware' => 'api'], function () {
         Route::post('', [GenreController::class, 'store']);
         Route::put('{id}', [GenreController::class, 'update']);
         Route::delete('{id}', [GenreController::class, 'destroy']);
+    });
+    Route::prefix('seats')->group(function () {
+        Route::post('change-type', [SeatController::class, 'changeSeatType']);
+        Route::post('disable', [SeatController::class, 'disableSeat']);
+        Route::post('generate', [SeatController::class, 'generateSeats']);
     });
 });
