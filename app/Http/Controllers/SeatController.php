@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Seat;
 use App\Models\SeatChangeHistory;
 use App\Models\SeatTemplate;
+use App\Models\TheaterRoom;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Validator;
 
 class SeatController extends Controller
@@ -99,7 +99,7 @@ class SeatController extends Controller
         }
 
         // Lấy template_id từ phòng chiếu
-        $templateId = SeatTemplate::where('room_id', $request->room_id)->value('template_id');
+        $templateId = TheaterRoom::where('room_id', $request->room_id)->value('template_id');
 
         if (!$templateId) {
             return response()->json(['message' => 'Template not found'], 404);

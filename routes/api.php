@@ -21,6 +21,6 @@ Route::group(['middleware' => 'api'], function () {
     Route::prefix('seats')->group(function () {
         Route::post('change-type', [SeatController::class, 'changeSeatType']);
         Route::post('disable', [SeatController::class, 'disableSeat']);
-        Route::post('generate', [SeatController::class, 'generateSeats']);
+        Route::post('generate', [SeatController::class, 'generateSeatsFromTemplate']);
     });
 });
