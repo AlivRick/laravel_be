@@ -33,6 +33,6 @@ class Genre extends Model
     // Scope to get only non-deleted genres
     public function scopeActive($query)
     {
-        return $query->where('is_deleted', false);
+        return $query->where('is_active', true);
     }
 }

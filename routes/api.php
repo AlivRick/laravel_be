@@ -7,17 +7,18 @@ use App\Http\Controllers\GenreController;
 use App\Http\Controllers\SeatController;
 use App\Http\Controllers\SeatTemplateController;
 use App\Http\Controllers\TheaterRoomController;
+use App\Http\Controllers\MovieController;
 Route::group(['middleware' => 'api'], function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
     Route::post('register', [AuthController::class, 'register']);
     Route::prefix('genres')->group(function () {
-        Route::get('', [GenreController::class, 'index']);
-        Route::get('{id}', [GenreController::class, 'show']);
-        Route::post('', [GenreController::class, 'store']);
-        Route::put('{id}', [GenreController::class, 'update']);
-        Route::delete('{id}', [GenreController::class, 'destroy']);
+        Route::get('/', [GenreController::class, 'index']);
+        Route::get('/{id}', [GenreController::class, 'show']);
+        Route::post('/', [GenreController::class, 'store']);
+        Route::put('/{id}', [GenreController::class, 'update']);
+        Route::delete('/{id}', [GenreController::class, 'destroy']);
     });
     Route::prefix('seats')->group(function () {
         Route::post('change-type', [SeatController::class, 'changeSeatType']);
@@ -42,5 +43,13 @@ Route::group(['middleware' => 'api'], function () {
         Route::get('/{id}', [TheaterRoomController::class, 'show']);
         Route::put('/{id}', [TheaterRoomController::class, 'update']);
         Route::delete('/{id}', [TheaterRoomController::class, 'destroy']);
+    });
+
+    Route::prefix('movies')->group(function () {
+        Route::get('/', [MovieController::class, 'index']);
+        Route::post('/', [MovieController::class, 'store']);
+        Route::get('/{id}', [MovieController::class, 'show']);
+        Route::put('/{id}', [MovieController::class, 'update']);
+        Route::delete('/{id}', [MovieController::class, 'destroy']);
     });
 });

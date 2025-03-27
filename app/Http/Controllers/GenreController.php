@@ -31,7 +31,7 @@ class GenreController extends Controller
             'description' => 'required|string'
         ]);
 
-        $validatedData['is_deleted'] = false;
+        $validatedData['is_active'] = true;
         $genre = Genre::create($validatedData);
 
         return response()->json(['message' => 'Genre created successfully', 'data' => $genre], 201);
@@ -45,7 +45,7 @@ class GenreController extends Controller
 
         $genre = Genre::with('movies')->find($id);
         
-        if (!$genre || $genre->is_deleted) {
+        if (!$genre || $genre->is_active) {
             return response()->json(['message' => 'Genre not found'], 404);
         }
 
@@ -60,7 +60,7 @@ class GenreController extends Controller
 
         $genre = Genre::find($id);
         
-        if (!$genre || $genre->is_deleted) {
+        if (!$genre || $genre->is_active) {
             return response()->json(['message' => 'Genre not found'], 404);
         }
 
@@ -80,13 +80,13 @@ class GenreController extends Controller
             return response()->json(['message' => 'Unauthorized. Admin role required.'], 403);
         }
 
-        $genre = Genre::find($id);
+        $genre = Genre::where('genre_id', $id)->first();
         
-        if (!$genre || $genre->is_deleted) {
+        if (!$genre || $genre->is_active === false) {
             return response()->json(['message' => 'Genre not found'], 404);
         }
 
-        $genre->is_deleted = true;
+        $genre->is_active = false;
         $genre->save();
 
         return response()->json(['message' => 'Genre deleted successfully']);
@@ -95,6 +95,6 @@ class GenreController extends Controller
     private function isAdmin()
     {
         $user = Auth::user();
-        return $user && $user->role_id === 1; // Assuming role_id = 1 is Admin
+        return $user && $user->role->role_name === "Administrator";
     }
 }
