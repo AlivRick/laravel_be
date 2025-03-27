@@ -14,11 +14,11 @@ class SeatController extends Controller
     public function changeSeatType(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'room_id' => 'required|integer',
-            'row_letter' => 'required|char',
-            'seat_num' => 'required|integer',
+            'room_id' => 'required|string|size:24',
+            'row_letter' => 'required|string|size:1',
+            'seat_num' => 'required|string',
             'new_type' => 'required|string|max:20',
-            'user_id' => 'required|integer',
+            'user_id' => 'required|string|size:24',
         ]);
 
         if ($validator->fails()) {
@@ -53,11 +53,11 @@ class SeatController extends Controller
     public function disableSeat(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'room_id' => 'required|integer',
-            'row_letter' => 'required|char',
-            'seat_num' => 'required|integer',
+            'room_id' => 'required|string|size:24',
+            'row_letter' => 'required|string|size:1',
+            'seat_num' => 'required|string',
             'reason' => 'required|string',
-            'user_id' => 'required|integer',
+            'user_id' => 'required|string|size:24',
         ]);
 
         if ($validator->fails()) {
@@ -133,12 +133,12 @@ class SeatController extends Controller
     public function mergeSeats(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'room_id' => 'required|integer',
-            'primary_row' => 'required|char',
-            'primary_seat' => 'required|integer',
-            'secondary_row' => 'required|char',
-            'secondary_seat' => 'required|integer',
-            'user_id' => 'required|integer',
+            'room_id' => 'required|string|size:24',
+            'primary_row' => 'required|string|size:1',
+            'primary_seat' => 'required|string',
+            'secondary_row' => 'required|string|size:1',
+            'secondary_seat' => 'required|string|size:1',
+            'user_id' => 'required|string|size:24',
         ]);
 
         if ($validator->fails()) {
@@ -191,10 +191,10 @@ class SeatController extends Controller
     public function resetSeat(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'room_id' => 'required|integer',
-            'row_letter' => 'required|char',
-            'seat_num' => 'required|integer',
-            'user_id' => 'required|integer',
+            'room_id' => 'required|string|size:24',
+            'row_letter' => 'required|string|size:1',
+            'seat_num' => 'required|string',
+            'user_id' => 'required|string|size:24',
         ]);
 
         if ($validator->fails()) {

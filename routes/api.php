@@ -23,6 +23,8 @@ Route::group(['middleware' => 'api'], function () {
         Route::post('change-type', [SeatController::class, 'changeSeatType']);
         Route::post('disable', [SeatController::class, 'disableSeat']);
         Route::post('generate', [SeatController::class, 'generateSeatsFromTemplate']);
+        Route::post('mergeSeats', [SeatController::class, 'mergeSeats']);
+        Route::post('resetSeat', [SeatController::class, 'resetSeat']); 
     });
     // Seat template management routes
     Route::prefix('seat-templates')->group(function () {
