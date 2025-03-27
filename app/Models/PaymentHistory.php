@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class PaymentHistory extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'paymenthistory';
     protected $primaryKey = 'payment_id';
+    public $incrementing = false; // Không tự tăng ID
+    protected $keyType = 'string'; // Định dạng kiểu chuỗi
 
     protected $fillable = [
+        'payment_id',
         'booking_id',
         'payment_method_id',
         'amount',

@@ -17,8 +17,8 @@ class TheaterRoomController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'cinema_complex_id' => 'required|integer',
-            'template_id' => 'required|integer',
+            'cinema_complex_id' => 'required|string|size:24',
+            'template_id' => 'required|string|size:24',
             'room_name' => 'required|string|max:255',
             'room_type' => 'required|string|max:255',
             'capacity' => 'required|integer',

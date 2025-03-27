@@ -12,14 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('showtime', function (Blueprint $table) {
-            $table->id('showtime_id');
-            $table->foreignId('movie_id')->constrained('movie', 'movie_id');
-            $table->foreignId('room_id')->constrained('theaterroom', 'room_id');
+            $table->string('showtime_id', 24)->primary();
+            $table->string('movie_id', 24);
+            $table->string('room_id', 24);
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->decimal('price', 10, 2);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->foreign('movie_id')->references('movie_id')->on('movie')->onDelete('cascade');
+            $table->foreign('room_id')->references('room_id')->on('theaterroom')->onDelete('cascade');
         });
     }
 

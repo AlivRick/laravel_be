@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class Movie extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'movie';
     protected $primaryKey = 'movie_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'movie_id',
         'title',
         'original_title',
         'director',

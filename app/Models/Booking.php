@@ -3,14 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\GeneratesId;
 class Booking extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'booking';
     protected $primaryKey = 'booking_id';
+    public $incrementing = false; // Không tự tăng ID
+    protected $keyType = 'string'; // Định dạng kiểu chuỗi
 
     protected $fillable = [
+        'booking_id',
         'user_id',
         'booking_time',
         'total_amount',

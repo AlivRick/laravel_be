@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('seattemplate', function (Blueprint $table) {
-            $table->id('template_id');
+            $table->char('template_id', 24)->primary(); // ID kiểu MongoDB
             $table->string('template_name');
             $table->text('description')->nullable();
             $table->integer('total_rows');

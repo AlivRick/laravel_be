@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class PaymentMethod extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'paymentmethod';
     protected $primaryKey = 'payment_method_id';
+    public $incrementing = false; // Không dùng auto-increment
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'payment_method_id',
         'method_name',
         'description',
         'is_active'

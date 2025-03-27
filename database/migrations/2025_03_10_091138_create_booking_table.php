@@ -12,14 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('booking', function (Blueprint $table) {
-            $table->id('booking_id');
-            $table->foreignId('user_id')->constrained('user', 'user_id');
+            $table->string('booking_id', 24)->primary();
+            $table->string('user_id', 24);
             $table->dateTime('booking_time');
             $table->decimal('total_amount', 10, 2);
-            $table->foreignId('payment_method_id')->constrained('paymentmethod', 'payment_method_id');
+            $table->string('payment_method_id', 24);
             $table->string('payment_status');
             $table->string('booking_status');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('user_id')->on('user')->onDelete('cascade');
+            $table->foreign('payment_method_id')->references('payment_method_id')->on('paymentmethod')->onDelete('cascade');
         });
     }
 

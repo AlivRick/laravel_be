@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class TheaterRoom extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'theaterroom';
     protected $primaryKey = 'room_id';
+    public $incrementing = false; // Không dùng auto-increment
+    protected $keyType = 'string'; // Định dạng kiểu string
 
     protected $fillable = [
+        'room_id',
         'cinema_complex_id',
         'template_id',
         'room_name',

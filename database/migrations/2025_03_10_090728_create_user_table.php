@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user', function (Blueprint $table) {
-            $table->id('user_id');
-            $table->foreignId('role_id')->constrained('role', 'role_id');
+            $table->char('user_id', 24)->primary();
+            $table->char('role_id', 24);
             $table->string('username')->unique();
             $table->string('password');
             $table->string('email')->unique();
@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('profile_image')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->foreign('role_id')->references('role_id')->on('role')->onDelete('cascade');
         });
     }
 

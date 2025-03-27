@@ -3,15 +3,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\GeneratesId;
 
 class Seat extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'seat';
     protected $primaryKey = 'seat_id';
+    public $incrementing = false; // Không dùng auto-increment
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'seat_id',
         'room_id',
         'seat_row',
         'seat_number',

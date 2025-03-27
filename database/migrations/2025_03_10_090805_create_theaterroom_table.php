@@ -12,14 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('theaterroom', function (Blueprint $table) {
-            $table->id('room_id');
-            $table->foreignId('cinema_complex_id')->constrained('cinemacomplex', 'cinema_complex_id');
-            $table->foreignId('template_id')->constrained('seattemplate', 'template_id');
+            $table->char('room_id', 24)->primary(); // ID kiểu MongoDB
+            $table->char('cinema_complex_id', 24); // Khóa ngoại kiểu char(24)
+            $table->char('template_id', 24); // Khóa ngoại kiểu char(24)
             $table->string('room_name');
             $table->string('room_type');
             $table->integer('capacity');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+             // Thiết lập khóa ngoại
+            $table->foreign('cinema_complex_id')->references('cinema_complex_id')->on('cinemacomplex')->onDelete('cascade');
+            $table->foreign('template_id')->references('template_id')->on('seattemplate')->onDelete('cascade');
         });
     }
 

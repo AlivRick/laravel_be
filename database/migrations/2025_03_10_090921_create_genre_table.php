@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('genre', function (Blueprint $table) {
-            $table->id('genre_id');
+            $table->string('genre_id', 24)->primary();
             $table->string('genre_name')->unique();
             $table->text('description')->nullable();
-            $table->boolean('is_deleted')->default(false);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

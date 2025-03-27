@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class ConcessionItem extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'concessionitem';
     protected $primaryKey = 'item_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'item_id',
         'item_name',
         'description',
         'price',

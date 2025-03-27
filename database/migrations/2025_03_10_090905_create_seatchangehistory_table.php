@@ -12,14 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('seatchangehistory', function (Blueprint $table) {
-            $table->id('history_id');
-            $table->foreignId('seat_id')->constrained('seat', 'seat_id');
-            $table->foreignId('room_id')->constrained('theaterroom', 'room_id');
-            $table->foreignId('changed_by')->constrained('user', 'user_id');
+            $table->char('history_id', 24)->primary();
+            $table->char('seat_id', 24);
+            $table->char('room_id', 24);
+            $table->char('changed_by', 24);
             $table->string('previous_state');
             $table->string('current_state');
             $table->text('change_reason')->nullable();
             $table->timestamp('changed_at')->useCurrent();
+            
+            $table->foreign('seat_id')->references('seat_id')->on('seat')->onDelete('cascade');
+            $table->foreign('room_id')->references('room_id')->on('theaterroom')->onDelete('cascade');
+            $table->foreign('changed_by')->references('user_id')->on('user')->onDelete('cascade');
         });
     }
 

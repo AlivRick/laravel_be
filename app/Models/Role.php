@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class Role extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'role';
     protected $primaryKey = 'role_id';
+    public $incrementing = false; // Không dùng auto-increment
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'role_id',
         'role_name',
         'description'
     ];

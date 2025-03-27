@@ -3,14 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\GeneratesId;
 class MovieReview extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'moviereview';
     protected $primaryKey = 'review_id';
+    public $incrementing = false; // Không dùng auto-increment
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'review_id',
         'movie_id',
         'user_id',
         'rating',

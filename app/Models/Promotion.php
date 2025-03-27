@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class Promotion extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'promotion';
     protected $primaryKey = 'promotion_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'promotion_id',
         'promotion_name',
         'description',
         'discount_amount',

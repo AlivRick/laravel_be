@@ -5,15 +5,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-
+use App\Traits\GeneratesId;
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, GeneratesId;
 
     protected $table = 'user';
     protected $primaryKey = 'user_id';
+    public $incrementing = false; // Không dùng auto-increment
+    protected $keyType = 'string'; // Định dạng kiểu string
 
     protected $fillable = [
+        'user_id',
         'role_id',
         'username',
         'password',

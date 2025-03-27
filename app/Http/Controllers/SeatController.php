@@ -91,7 +91,7 @@ class SeatController extends Controller
     public function generateSeatsFromTemplate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'room_id' => 'required|integer',
+            'room_id' => 'required|string|size:24',
         ]);
 
         if ($validator->fails()) {

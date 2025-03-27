@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class CinemaComplex extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'cinemacomplex';
     protected $primaryKey = 'cinema_complex_id';
+    public $incrementing = false; // Không tự tăng ID
+    protected $keyType = 'string'; // Định dạng kiểu chuỗi
 
     protected $fillable = [
+        'cinema_complex_id',
         'complex_name',
         'address',
         'city',

@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class BookingConcession extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'bookingconcession';
     protected $primaryKey = 'booking_concession_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'booking_concession_id',
         'booking_id',
         'item_id',
         'quantity',

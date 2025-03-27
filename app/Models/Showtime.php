@@ -3,15 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\GeneratesId;
 class Showtime extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesId;
 
     protected $table = 'showtime';
     protected $primaryKey = 'showtime_id';
+    protected $keyType = 'string';
+    public $timestamps = false;
 
     protected $fillable = [
+        'showtime_id',
         'movie_id',
         'room_id',
         'start_time',

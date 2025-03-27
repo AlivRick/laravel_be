@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\SeatController;
-
+use App\Http\Controllers\SeatTemplateController;
+use App\Http\Controllers\TheaterRoomController;
 Route::group(['middleware' => 'api'], function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);
@@ -22,5 +23,22 @@ Route::group(['middleware' => 'api'], function () {
         Route::post('change-type', [SeatController::class, 'changeSeatType']);
         Route::post('disable', [SeatController::class, 'disableSeat']);
         Route::post('generate', [SeatController::class, 'generateSeatsFromTemplate']);
+    });
+    // Seat template management routes
+    Route::prefix('seat-templates')->group(function () {
+        Route::get('/', [SeatTemplateController::class, 'index']);
+        Route::post('/', [SeatTemplateController::class, 'store']);
+        Route::get('/{id}', [SeatTemplateController::class, 'show']);
+        Route::put('/{id}', [SeatTemplateController::class, 'update']);
+        Route::delete('/{id}', [SeatTemplateController::class, 'destroy']);
+    });
+
+    // Theater room management routes
+    Route::prefix('theater-rooms')->group(function () {
+        Route::get('/', [TheaterRoomController::class, 'index']);
+        Route::post('/', [TheaterRoomController::class, 'store']);
+        Route::get('/{id}', [TheaterRoomController::class, 'show']);
+        Route::put('/{id}', [TheaterRoomController::class, 'update']);
+        Route::delete('/{id}', [TheaterRoomController::class, 'destroy']);
     });
 });
