@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class GenreController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
-
     public function index()
     {
         $genres = Genre::active()->get();
