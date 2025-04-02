@@ -11,6 +11,14 @@ Route::group(['middleware' => ['force.json', 'api']], function () {
     require __DIR__ . '/seat_templates.php';
     require __DIR__ . '/theater_rooms.php';
     require __DIR__ . '/movies.php';
+    require __DIR__ . '/cinema_complexes.php';
+    require __DIR__ . '/payment_methods.php';
+    require __DIR__ . '/ticket_types.php';
+    require __DIR__ . '/showtimes.php';
+    require __DIR__ . '/concession_items.php';
+    require __DIR__ . '/promotions.php';
+    require __DIR__ . '/user_promotions.php';
+    require __DIR__ . '/roles.php';
 });
 
 // Route::group(['middleware' => 'api'], function () {
