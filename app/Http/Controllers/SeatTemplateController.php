@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\SeatTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\ApiResponse;
 
 class SeatTemplateController extends Controller
 {
+    use ApiResponse;
+
     public function index()
     {
         $templates = SeatTemplate::all();
-        return response()->json($templates, 200);
+        return $this->createSuccessResponse($templates);
     }
 
     public function store(Request $request)
@@ -24,41 +27,41 @@ class SeatTemplateController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return $this->createErrorResponse($validator->errors()->first(), 400);
         }
 
         $template = SeatTemplate::create($request->all());
-        return response()->json($template, 201);
+        return $this->createSuccessResponse($template, 201);
     }
 
     public function show($id)
     {
         $template = SeatTemplate::find($id);
         if (!$template) {
-            return response()->json(['message' => 'Template not found'], 404);
+            return $this->createErrorResponse('Template not found', 404);
         }
-        return response()->json($template, 200);
+        return $this->createSuccessResponse($template);
     }
 
     public function update(Request $request, $id)
     {
         $template = SeatTemplate::find($id);
         if (!$template) {
-            return response()->json(['message' => 'Template not found'], 404);
+            return $this->createErrorResponse('Template not found', 404);
         }
 
         $template->update($request->all());
-        return response()->json($template, 200);
+        return $this->createSuccessResponse($template);
     }
 
     public function destroy($id)
     {
         $template = SeatTemplate::find($id);
         if (!$template) {
-            return response()->json(['message' => 'Template not found'], 404);
+            return $this->createErrorResponse('Template not found', 404);
         }
 
         $template->delete();
-        return response()->json(['message' => 'Template deleted successfully'], 200);
+        return $this->createSuccessResponse(['message' => 'Template deleted successfully']);
     }
 }

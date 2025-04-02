@@ -3,7 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['middleware' => 'api'], function () {
+
+Route::group(['middleware' => ['force.json', 'api']], function () {
     require __DIR__ . '/auth.php';
     require __DIR__ . '/genres.php';
     require __DIR__ . '/seats.php';

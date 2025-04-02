@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\TheaterRoom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\ApiResponse;
 
 class TheaterRoomController extends Controller
 {
+    use ApiResponse;
+
     public function index()
     {
         $rooms = TheaterRoom::all();
-        return response()->json($rooms, 200);
+        return $this->createSuccessResponse($rooms);
     }
 
     public function store(Request $request)
@@ -26,41 +29,41 @@ class TheaterRoomController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return $this->createErrorResponse($validator->errors()->first(), 400);
         }
 
         $room = TheaterRoom::create($request->all());
-        return response()->json($room, 201);
+        return $this->createSuccessResponse($room, 201);
     }
 
     public function show($id)
     {
         $room = TheaterRoom::find($id);
         if (!$room) {
-            return response()->json(['message' => 'Room not found'], 404);
+            return $this->createErrorResponse('Room not found', 404);
         }
-        return response()->json($room, 200);
+        return $this->createSuccessResponse($room);
     }
 
     public function update(Request $request, $id)
     {
         $room = TheaterRoom::find($id);
         if (!$room) {
-            return response()->json(['message' => 'Room not found'], 404);
+            return $this->createErrorResponse('Room not found', 404);
         }
 
         $room->update($request->all());
-        return response()->json($room, 200);
+        return $this->createSuccessResponse($room);
     }
 
     public function destroy($id)
     {
         $room = TheaterRoom::find($id);
         if (!$room) {
-            return response()->json(['message' => 'Room not found'], 404);
+            return $this->createErrorResponse('Room not found', 404);
         }
 
         $room->delete();
-        return response()->json(['message' => 'Room deleted successfully'], 200);
+        return $this->createSuccessResponse(['message' => 'Room deleted successfully']);
     }
 }

@@ -8,9 +8,12 @@ use App\Models\SeatTemplate;
 use App\Models\TheaterRoom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\ApiResponse;
 
 class SeatController extends Controller
 {
+    use ApiResponse;
+
     public function changeSeatType(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -22,7 +25,7 @@ class SeatController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return $this->createErrorResponse($validator->errors()->first(), 400);
         }
 
         $seat = Seat::where('room_id', $request->room_id)
@@ -31,7 +34,7 @@ class SeatController extends Controller
             ->first();
 
         if (!$seat) {
-            return response()->json(['message' => 'Seat not found'], 404);
+            return $this->createErrorResponse('Seat not found', 404);
         }
 
         $currentType = $seat->seat_type;
@@ -47,7 +50,7 @@ class SeatController extends Controller
             'change_reason' => "Changed seat type from $currentType to {$request->new_type}",
         ]);
 
-        return response()->json(['message' => 'Seat type changed successfully'], 200);
+        return $this->createSuccessResponse(['message' => 'Seat type changed successfully']);
     }
 
     public function disableSeat(Request $request)
@@ -61,7 +64,7 @@ class SeatController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return $this->createErrorResponse($validator->errors()->first(), 400);
         }
 
         $seat = Seat::where('room_id', $request->room_id)
@@ -70,7 +73,7 @@ class SeatController extends Controller
             ->first();
 
         if (!$seat) {
-            return response()->json(['message' => 'Seat not found'], 404);
+            return $this->createErrorResponse('Seat not found', 404);
         }
 
         $seat->is_available = false;
@@ -85,7 +88,7 @@ class SeatController extends Controller
             'change_reason' => $request->reason,
         ]);
 
-        return response()->json(['message' => 'Seat disabled successfully'], 200);
+        return $this->createSuccessResponse(['message' => 'Seat disabled successfully']);
     }
 
     public function generateSeatsFromTemplate(Request $request)
@@ -95,14 +98,14 @@ class SeatController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return $this->createErrorResponse($validator->errors()->first(), 400);
         }
 
         // Lấy template_id từ phòng chiếu
         $templateId = TheaterRoom::where('room_id', $request->room_id)->value('template_id');
 
         if (!$templateId) {
-            return response()->json(['message' => 'Template not found'], 404);
+            return $this->createErrorResponse('Template not found', 404);
         }
 
         // Lấy thông tin từ template
@@ -126,9 +129,8 @@ class SeatController extends Controller
             }
         }
 
-        return response()->json(['message' => 'Seats generated from template successfully'], 200);
+        return $this->createSuccessResponse(['message' => 'Seats generated from template successfully']);
     }
-
 
     public function mergeSeats(Request $request)
     {
@@ -142,7 +144,7 @@ class SeatController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return $this->createErrorResponse($validator->errors()->first(), 400);
         }
 
         $primarySeat = Seat::where('room_id', $request->room_id)
@@ -156,7 +158,7 @@ class SeatController extends Controller
             ->first();
 
         if (!$primarySeat || !$secondarySeat) {
-            return response()->json(['message' => 'One or both seats not found'], 404);
+            return $this->createErrorResponse('One or both seats not found', 404);
         }
 
         $primarySeat->seat_type = 'Couple';
@@ -185,7 +187,7 @@ class SeatController extends Controller
             'change_reason' => "Primary seat in merge with {$request->secondary_row}{$request->secondary_seat}",
         ]);
 
-        return response()->json(['message' => 'Seats merged successfully'], 200);
+        return $this->createSuccessResponse(['message' => 'Seats merged successfully']);
     }
 
     public function resetSeat(Request $request)
@@ -198,7 +200,7 @@ class SeatController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return $this->createErrorResponse($validator->errors()->first(), 400);
         }
 
         $seat = Seat::where('room_id', $request->room_id)
@@ -207,7 +209,7 @@ class SeatController extends Controller
             ->first();
 
         if (!$seat) {
-            return response()->json(['message' => 'Seat not found'], 404);
+            return $this->createErrorResponse('Seat not found', 404);
         }
 
         $currentState = json_encode([
@@ -231,6 +233,6 @@ class SeatController extends Controller
             'change_reason' => 'Reset to default state',
         ]);
 
-        return response()->json(['message' => 'Seat reset successfully'], 200);
+        return $this->createSuccessResponse(['message' => 'Seat reset successfully']);
     }
 }

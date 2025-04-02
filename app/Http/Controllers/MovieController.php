@@ -6,12 +6,16 @@ use App\Models\Movie;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\ApiResponse;
 
 class MovieController extends Controller
 {
+    use ApiResponse;
+
     public function index()
     {
-        return Movie::all();
+        $movies = Movie::all();
+        return $this->createSuccessResponse($movies);
     }
 
     public function store(Request $request)
@@ -40,40 +44,38 @@ class MovieController extends Controller
         // Gán thể loại vào bảng moviegenre
         $movie->genres()->attach($validatedData['genre_ids']);
 
-        return response()->json([
-            'message' => 'Movie created successfully',
-            'data' => $movie->load('genres') // Load genres luôn để kiểm tra
-        ], 201);
+        return $this->createSuccessResponse($movie->load('genres'), 201);
     }
 
     public function show($id)
     {
-        return Movie::findOrFail($id);
+        $movie = Movie::findOrFail($id);
+        return $this->createSuccessResponse($movie);
     }
 
     public function update(Request $request, $id)
     {
         $movie = Movie::findOrFail($id);
         $movie->update($request->all());
-        return response()->json(['message' => 'Movie update successfully', 'data' => $movie], 201);
+        return $this->createSuccessResponse($movie);
     }
 
     public function destroy($id)
     {
         if (!$this->isAdmin()) {
-            return response()->json(['message' => 'Unauthorized. Admin role required.'], 403);
+            return $this->createErrorResponse('Unauthorized. Admin role required.', 403);
         }
         
         $movie = Movie::where('movie_id', $id)->first();
 
         if (!$movie || $movie->is_active === false) {
-            return response()->json(['message' => 'Movie not found'], 404);
+            return $this->createErrorResponse('Movie not found', 404);
         }
 
         $movie->is_active = false;
         $movie->save();
 
-        return response()->json(['message' => 'Movie deleted successfully']);
+        return $this->createSuccessResponse(['message' => 'Movie deleted successfully']);
     }
 
     private function isAdmin()
