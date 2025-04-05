@@ -23,7 +23,7 @@ class ConcessionItemController extends Controller
             'item_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'category' => 'nullable|string|max:100',
         ]);
 
@@ -34,6 +34,12 @@ class ConcessionItemController extends Controller
         $validatedData = $validator->validated();
         $validatedData['is_active'] = true;
         
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('concession_items', 'public');
+            $validatedData['image'] = $path; // Lưu đường dẫn vào DB
+        }
+
+
         $item = ConcessionItem::create($validatedData);
         return $this->createSuccessResponse($item, 201);
     }

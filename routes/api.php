@@ -8,6 +8,7 @@ Route::group(['middleware' => ['force.json', 'api']], function () {
     require __DIR__ . '/auth.php';
     require __DIR__ . '/genres.php';
     require __DIR__ . '/seats.php';
+    require __DIR__ . '/bookings.php';
     require __DIR__ . '/seat_templates.php';
     require __DIR__ . '/theater_rooms.php';
     require __DIR__ . '/movies.php';
@@ -19,6 +20,7 @@ Route::group(['middleware' => ['force.json', 'api']], function () {
     require __DIR__ . '/promotions.php';
     require __DIR__ . '/user_promotions.php';
     require __DIR__ . '/roles.php';
+    
 });
 
 // Route::group(['middleware' => 'api'], function () {

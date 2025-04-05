@@ -41,9 +41,9 @@ class MovieController extends Controller
         // Tạo movie mới, nhưng bỏ genre_ids ra vì nó không thuộc bảng movie
         $movie = Movie::create(collect($validatedData)->except('genre_ids')->toArray());
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('movies', 'public');
-            $validatedData['image'] = $path; // Lưu đường dẫn vào DB
+        if ($request->hasFile('poster_url')) {
+            $path = $request->file('poster_url')->store('movies', 'public');
+            $validatedData['poster_url'] = $path; // Lưu đường dẫn vào DB
         }
 
         // Gán thể loại vào bảng moviegenre

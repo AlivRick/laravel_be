@@ -35,4 +35,9 @@ class PaymentMethod extends Model
     {
         return $this->hasMany(PaymentHistory::class, 'payment_method_id', 'payment_method_id');
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }
