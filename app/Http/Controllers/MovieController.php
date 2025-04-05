@@ -33,13 +33,18 @@ class MovieController extends Controller
             'language' => 'nullable|string',
             'age_restriction' => 'nullable|string',
             'trailer_url' => 'nullable|string',
-            'poster_url' => 'nullable|string',
+            'poster_url' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'genre_ids' => 'required|array',  // Cho phép nhập nhiều genre_id
             'genre_ids.*' => 'exists:genre,genre_id' // Kiểm tra các genre_id có tồn tại không
         ]);
         $validatedData['is_active'] = true;
         // Tạo movie mới, nhưng bỏ genre_ids ra vì nó không thuộc bảng movie
         $movie = Movie::create(collect($validatedData)->except('genre_ids')->toArray());
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('movies', 'public');
+            $validatedData['image'] = $path; // Lưu đường dẫn vào DB
+        }
 
         // Gán thể loại vào bảng moviegenre
         $movie->genres()->attach($validatedData['genre_ids']);

@@ -61,7 +61,8 @@ class SeatTemplateController extends Controller
             return $this->createErrorResponse('Template not found', 404);
         }
 
-        $template->delete();
+        $template->is_active = false;
+        $template->save();
         return $this->createSuccessResponse(['message' => 'Template deleted successfully']);
     }
 }

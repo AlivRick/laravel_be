@@ -29,7 +29,7 @@ class CinemaComplexController extends Controller
             'opening_time' => 'required|date_format:H:i',
             'closing_time' => 'required|date_format:H:i|after:opening_time',
             'description' => 'nullable|string',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -38,6 +38,11 @@ class CinemaComplexController extends Controller
 
         $validatedData = $validator->validated();
         $validatedData['is_active'] = true;
+        
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('cinemas', 'public');
+            $validatedData['image'] = $path; // Lưu đường dẫn vào DB
+        }
         
         $complex = CinemaComplex::create($validatedData);
         return $this->createSuccessResponse($complex, 201);

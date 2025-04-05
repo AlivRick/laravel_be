@@ -6,6 +6,7 @@ use App\Models\TheaterRoom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiResponse;
+use App\Models\SeatTemplate;
 
 class TheaterRoomController extends Controller
 {
@@ -24,14 +25,21 @@ class TheaterRoomController extends Controller
             'template_id' => 'required|string|size:24',
             'room_name' => 'required|string|max:255',
             'room_type' => 'required|string|max:255',
-            'capacity' => 'required|integer',
-            'is_active' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
             return $this->createErrorResponse($validator->errors()->first(), 400);
         }
+        
+        $seat_template = SeatTemplate::find($request->template_id);
+        if (!$seat_template) {
+            return $this->createErrorResponse('Seat template not found', 404);
+        }
 
+        $total_seats = $seat_template->total_rows * $seat_template->seats_per_row;
+        //set additions to models
+        $request->merge(['capacity' => $total_seats]);
+        $request->merge(['is_active' => true]);
         $room = TheaterRoom::create($request->all());
         return $this->createSuccessResponse($room, 201);
     }
@@ -63,7 +71,8 @@ class TheaterRoomController extends Controller
             return $this->createErrorResponse('Room not found', 404);
         }
 
-        $room->delete();
+        $room->is_active = false;
+        $room->save();
         return $this->createSuccessResponse(['message' => 'Room deleted successfully']);
     }
 }

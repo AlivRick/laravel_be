@@ -15,7 +15,7 @@ class ShowtimeController extends Controller
 
     public function index()
     {
-        $showtimes = Showtime::with(['movie', 'room'])->get();
+        $showtimes = Showtime::with(['movie', 'theaterroom'])->get();
         return $this->createSuccessResponse($showtimes);
     }
 
@@ -80,7 +80,7 @@ class ShowtimeController extends Controller
 
     public function show($id)
     {
-        $showtime = Showtime::with(['movie', 'room'])->find($id);
+        $showtime = Showtime::with(['movie', 'theaterroom'])->find($id);
         if (!$showtime || !$showtime->is_active) {
             return $this->createErrorResponse('Showtime not found', 404);
         }
@@ -138,7 +138,7 @@ class ShowtimeController extends Controller
         }
 
         $showtime->update($validatedData);
-        return $this->createSuccessResponse($showtime->load(['movie', 'room']));
+        return $this->createSuccessResponse($showtime->load(['movie', 'theaterroom']));
     }
 
     public function destroy($id)

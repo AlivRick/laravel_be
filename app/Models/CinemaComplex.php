@@ -40,4 +40,9 @@ class CinemaComplex extends Model
     {
         return $this->hasMany(TheaterRoom::class, 'cinema_complex_id', 'cinema_complex_id');
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }
