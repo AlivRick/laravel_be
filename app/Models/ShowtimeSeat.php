@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\GeneratesId;
+use Illuminate\Support\Facades\Cache;
 class ShowtimeSeat extends Model
 {
     use HasFactory, GeneratesId;
@@ -29,5 +30,24 @@ class ShowtimeSeat extends Model
     public function seat()
     {
         return $this->belongsTo(Seat::class, 'seat_id', 'seat_id');
+    }
+
+    
+    public static function isSeatReserved($showtimeId, $seatId)
+    {
+        $key = "reservation:{$showtimeId}:{$seatId}";
+        return Cache::has($key);
+    }
+
+    public static function reserveSeat($showtimeId, $seatId, $ttl = 900) // 15 phút = 900 giây
+    {
+        $key = "reservation:{$showtimeId}:{$seatId}";
+        Cache::put($key, true, $ttl);
+    }
+
+    public static function releaseSeat($showtimeId, $seatId)
+    {
+        $key = "reservation:{$showtimeId}:{$seatId}";
+        Cache::forget($key);
     }
 }

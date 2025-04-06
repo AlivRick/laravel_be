@@ -183,4 +183,82 @@ class ShowtimeController extends Controller
 
         return $this->createSuccessResponse(['message' => 'Showtime deleted successfully']);
     }
+
+
+    public function getShowtimeSeats($showtimeId)
+    {
+        $showtime = Showtime::with(['seats.seat.row'])->findOrFail($showtimeId);
+        $rows = $showtime->seats->groupBy('seat.row_id')->map(function ($seats) {
+            $row = $seats->first()->seat->row;
+            return [
+                'rowname' => $row->rowname,
+                'rowseats' => $seats->map(function ($showtimeSeat) {
+                    $seat = $showtimeSeat->seat;
+                    $isReserved = ShowtimeSeat::isSeatReserved($showtimeSeat->showtime_id, $seat->id);
+                    return [
+                        'seat_type' => $seat->seat_type,
+                        'ticketid' => $seat->ticketid,
+                        'price' => $seat->price,
+                        'isseat' => $seat->isseat,
+                        'name' => $seat->name,
+                        'isoff' => $seat->isoff,
+                        'issold' => $showtimeSeat->is_booked || $isReserved,
+                        'colindex' => $seat->colindex,
+                        'seatindex' => $seat->seatindex,
+                        'tickettypeid' => $seat->tickettypeid,
+                    ];
+                })->toArray(),
+                'maxcolumn' => $row->maxcolumn,
+            ];
+        });
+
+        return response()->json(['data' => $rows->values()]);
+    }
+
+    public function reserveSeats(Request $request, $showtimeId)
+{
+    $seatIds = $request->input('seat_ids'); // Mảng chuỗi seat_id
+
+    // Validate seat_ids
+    if (!is_array($seatIds) || empty($seatIds)) {
+        return response()->json(['error' => 'seat_ids must be a non-empty array'], 400);
+    }
+
+    $showtime = Showtime::findOrFail($showtimeId);
+
+    foreach ($seatIds as $seatId) {
+        $showtimeSeat = ShowtimeSeat::where('showtime_id', $showtime->showtime_id) // Sửa showtime_id thành id
+            ->where('seat_id', $seatId) // seat_id là varchar
+            ->first();
+
+        if (!$showtimeSeat || $showtimeSeat->is_booked || ShowtimeSeat::isSeatReserved($showtimeId, $seatId)) {
+            return response()->json(['error' => "Seat $seatId is unavailable"], 400);
+        }
+
+        ShowtimeSeat::reserveSeat($showtimeId, $seatId);
+    }
+
+    return response()->json(['message' => 'Seats reserved for 15 minutes']);
+}
+
+    public function confirmBooking(Request $request, $showtimeId)
+    {
+        $seatIds = $request->input('seat_ids');
+        $showtime = Showtime::findOrFail($showtimeId);
+
+        foreach ($seatIds as $seatId) {
+            $showtimeSeat = ShowtimeSeat::where('showtime_id', $showtimeId)
+                ->where('seat_id', $seatId)
+                ->first();
+
+            if (!$showtimeSeat || $showtimeSeat->is_booked || !ShowtimeSeat::isSeatReserved($showtimeId, $seatId)) {
+                return response()->json(['error' => 'Invalid reservation'], 400);
+            }
+
+            $showtimeSeat->update(['is_booked' => true]);
+            ShowtimeSeat::releaseSeat($showtimeId, $seatId);
+        }
+
+        return response()->json(['message' => 'Booking confirmed']);
+    }
 }
