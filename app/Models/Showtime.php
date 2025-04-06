@@ -12,6 +12,7 @@ class Showtime extends Model
     protected $primaryKey = 'showtime_id';
     protected $keyType = 'string';
     public $timestamps = false;
+    public $incrementing = false; // Không dùng auto-increment
 
     protected $fillable = [
         'showtime_id',

@@ -13,6 +13,7 @@ use App\Models\Showtime;
 use App\Models\TicketType;
 use App\Models\ConcessionItem;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ShowtimeSeat; // nhớ import model này ở trên nhé
 
 class BookingController extends Controller
 {
@@ -91,6 +92,11 @@ class BookingController extends Controller
         foreach ($bookingConcessions as $concession) {
             $concession['booking_id'] = $booking->booking_id;
             BookingConcession::create($concession);
+
+            // Update is_booked = true cho seat đã booking
+            ShowtimeSeat::where('showtime_id', $detail['showtime_id'])
+                ->where('seat_id', $detail['seat_id'])
+                ->update(['is_booked' => true]);
         }
 
         PaymentHistory::create([

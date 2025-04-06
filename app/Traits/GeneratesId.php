@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 trait GeneratesId
 {
@@ -21,7 +22,9 @@ trait GeneratesId
     {
         static::creating(function ($model) {
             if (!$model->{$model->getKeyName()}) {
-                $model->{$model->getKeyName()} = self::generateId();
+                $newId = self::generateId();
+                $model->{$model->getKeyName()} = $newId;
+                Log::info('Generated Showtime ID: ' . $newId);
             }
         });
     }
