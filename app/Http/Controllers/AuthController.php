@@ -64,7 +64,7 @@ class AuthController extends Controller
             if (!DB::connection()->getDatabaseName()) {
                 return $this->createErrorResponse('Could not connect to the database.', 500);
             }
-            $role = Role::where('name', 'User')->first();
+            $role = Role::where('role_name', 'User')->first();
 
             $user = new User();
             $user->username = $validatedData['username'];
@@ -73,7 +73,7 @@ class AuthController extends Controller
             $user->full_name = $validatedData['full_name'];
             $user->phone_number = $validatedData['phone_number'] ?? null;
             $user->date_of_birth = $validatedData['date_of_birth'] ?? null;
-            $user->role_id = $role->id;
+            $user->role_id = $role->role_id;
             $user->is_active = true;
             $user->save();
 
