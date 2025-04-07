@@ -13,6 +13,8 @@ class SeatTemplate extends Model
     protected $primaryKey = 'template_id';
     public $incrementing = false; // Không dùng auto-increment
     protected $keyType = 'string'; // Định dạng kiểu string
+    public $timestamps = true;
+    protected $connection = 'mysql';
 
     protected $fillable = [
         'template_id',

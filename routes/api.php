@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SeatTemplateController;
 
 
 Route::group(['middleware' => ['force.json', 'api']], function () {
@@ -68,3 +69,11 @@ Route::group(['middleware' => ['force.json', 'api']], function () {
 //         Route::delete('/{id}', [MovieController::class, 'destroy']);
 //     });
 // });
+
+// Seat Template Routes
+Route::prefix('cinema-complexes/{complexId}/rooms/{roomId}')->group(function () {
+    Route::get('/check-design', [SeatTemplateController::class, 'checkRoomDesign']);
+    Route::put('/template', [SeatTemplateController::class, 'updateTemplate']);
+    Route::put('/seats', [SeatTemplateController::class, 'updateSeats']);
+    Route::get('/seats', [SeatTemplateController::class, 'getSeats']);
+});

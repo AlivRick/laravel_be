@@ -6,6 +6,8 @@ use App\Models\Movie;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Traits\ApiResponse;
 
 class MovieController extends Controller
@@ -33,23 +35,36 @@ class MovieController extends Controller
             'language' => 'nullable|string',
             'age_restriction' => 'nullable|string',
             'trailer_url' => 'nullable|string',
-            'poster_url' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'genre_ids' => 'required|array',  // Cho phép nhập nhiều genre_id
-            'genre_ids.*' => 'exists:genre,genre_id' // Kiểm tra các genre_id có tồn tại không
+            'poster_url' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'genre_ids' => 'required|array',
+            'genre_ids.*' => 'exists:genre,genre_id'
         ]);
-        $validatedData['is_active'] = true;
-        // Tạo movie mới, nhưng bỏ genre_ids ra vì nó không thuộc bảng movie
-        $movie = Movie::create(collect($validatedData)->except('genre_ids')->toArray());
 
-        if ($request->hasFile('poster_url')) {
-            $path = $request->file('poster_url')->store('movies', 'public');
-            $validatedData['poster_url'] = $path; // Lưu đường dẫn vào DB
+        try {
+            // Xử lý upload ảnh
+            if ($request->hasFile('poster_url')) {
+                $file = $request->file('poster_url');
+                $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                // Lưu vào thư mục storage/app/public/movies
+                $path = $file->storeAs('movies', $filename, 'public');
+                $validatedData['poster_url'] = $path;
+            }
+
+            $validatedData['is_active'] = true;
+
+            // Tạo movie mới
+            $movie = Movie::create(collect($validatedData)->except('genre_ids')->toArray());
+
+            // Gán thể loại
+            if (isset($validatedData['genre_ids'])) {
+                $movie->genres()->attach($validatedData['genre_ids']);
+            }
+
+            return $this->createSuccessResponse($movie->load('genres'), 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating movie: ' . $e->getMessage());
+            return $this->createErrorResponse('Error creating movie: ' . $e->getMessage(), 500);
         }
-
-        // Gán thể loại vào bảng moviegenre
-        $movie->genres()->attach($validatedData['genre_ids']);
-
-        return $this->createSuccessResponse($movie->load('genres'), 201);
     }
 
     public function show($id)
@@ -60,9 +75,55 @@ class MovieController extends Controller
 
     public function update(Request $request, $id)
     {
-        $movie = Movie::findOrFail($id);
-        $movie->update($request->all());
-        return $this->createSuccessResponse($movie);
+        try {
+            $movie = Movie::findOrFail($id);
+
+            $validatedData = $request->validate([
+                'title' => 'required|string',
+                'original_title' => 'nullable|string',
+                'director' => 'nullable|string',
+                'cast' => 'nullable|string',
+                'description' => 'nullable|string',
+                'duration' => 'required|integer',
+                'release_date' => 'required|date',
+                'end_date' => 'nullable|date',
+                'country' => 'nullable|string',
+                'language' => 'nullable|string',
+                'age_restriction' => 'nullable|string',
+                'trailer_url' => 'nullable|string',
+                'poster_url' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                'genre_ids' => 'required|array',
+                'genre_ids.*' => 'exists:genre,genre_id'
+            ]);
+
+            // Xử lý upload ảnh mới nếu có
+            if ($request->hasFile('poster_url')) {
+                $file = $request->file('poster_url');
+                $filename = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
+                
+                // Xóa ảnh cũ nếu tồn tại
+                if ($movie->poster_url && Storage::disk('public')->exists($movie->poster_url)) {
+                    Storage::disk('public')->delete($movie->poster_url);
+                }
+                
+                // Lưu ảnh mới
+                $path = $file->storeAs('movies', $filename, 'public');
+                $validatedData['poster_url'] = $path;
+            }
+
+            // Cập nhật thông tin phim
+            $movie->update(collect($validatedData)->except('genre_ids')->toArray());
+
+            // Cập nhật thể loại
+            if (isset($validatedData['genre_ids'])) {
+                $movie->genres()->sync($validatedData['genre_ids']);
+            }
+
+            return $this->createSuccessResponse($movie->load('genres'));
+        } catch (\Exception $e) {
+            Log::error('Error updating movie: ' . $e->getMessage());
+            return $this->createErrorResponse('Error updating movie: ' . $e->getMessage(), 500);
+        }
     }
 
     public function destroy($id)
