@@ -7,11 +7,14 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use App\Models\TicketType;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\ConcessionItem;
 use App\Models\ShowtimeSeat;
 use App\Models\Booking;
 use App\Traits\ApiResponse;
+use App\Mail\BookingSuccessMail;
 use App\Models\BookingConcession;
 use App\Models\BookingDetail;
 use App\Models\Showtime;
@@ -37,7 +40,7 @@ class VnpayController extends Controller
         if ($validator->fails()) {
             return $this->createErrorResponse($validator->errors()->first(), 400);
         }
-        
+
         $validatedData = $validator->validated();
         $orderInfo = $validatedData['orderInfo'];
         $bookingDetails = $orderInfo['booking_details'];
@@ -50,7 +53,7 @@ class VnpayController extends Controller
                 ->where('seat_id', $detail['seat_id'])
                 ->where('is_booked', true)
                 ->exists();
-        
+
             if ($isBooked) {
                 return $this->createErrorResponse('This seat is no longer available.', 409); // 409 Conflict hợp lý hơn
             }
@@ -164,11 +167,11 @@ class VnpayController extends Controller
                 'booking_status' => 'confirmed',
             ]);
             // Lưu lịch sử thanh toán vào PaymentHistory
-            $payment_History ->update([
+            $payment_History->update([
                 'payment_status' => 'completed',
                 'payment_time' => now(),
             ]);
-           
+
             // Update is_booked
             foreach ($booking->bookingDetails as $detail) {
                 ShowtimeSeat::where('showtime_id', $detail->showtime_id)
@@ -178,6 +181,10 @@ class VnpayController extends Controller
                 // Xoá Redis
                 ShowtimeSeat::releaseSeat($detail->showtime_id, $detail->seat_id);
             }
+
+            // Gửi email chứa mã QR
+            Mail::to($booking->user->email)->send(new BookingSuccessMail($booking));
+
             return redirect('/payment-success');
         }
 

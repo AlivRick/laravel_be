@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VnpayController;
-
+use App\Http\Controllers\BookingController;
 
 Route::group(['middleware' => ['force.json', 'api']], function () {
     require __DIR__ . '/auth.php';
@@ -23,6 +23,8 @@ Route::group(['middleware' => ['force.json', 'api']], function () {
     require __DIR__ . '/roles.php';
     require __DIR__ . '/vnpay.php';
     Route::get('/vnpay/return', [VnpayController::class, 'return']);
+    Route::post('/check-in', [BookingController::class, 'checkIn']);
+
 });
 
 // Route::group(['middleware' => 'api'], function () {

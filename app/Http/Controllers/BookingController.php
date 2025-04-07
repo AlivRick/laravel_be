@@ -108,7 +108,7 @@ class BookingController extends Controller
             'payment_time' => now(),
             'payment_status' => $booking->payment_status,
         ]);
-        
+
         return $this->createSuccessResponse(
             $booking->load(['user', 'paymentMethod', 'bookingDetails', 'concessions']),
             201
@@ -170,5 +170,32 @@ class BookingController extends Controller
         $booking->delete();
 
         return $this->createSuccessResponse(['message' => 'Booking deleted successfully']);
+    }
+
+
+
+
+    public function checkIn(Request $request)
+    {
+        $request->validate([
+            'booking_id' => 'required|exists:booking,booking_id',
+        ]);
+
+        $booking = Booking::findOrFail($request->booking_id);
+
+        if ($booking->booking_status == 'completed') {
+            return response()->json([
+                'code' => 400,
+                'message' => 'This booking has already been completed.',
+            ]);
+        }
+
+        $booking->booking_status = 'completed';
+        $booking->save();
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'Check-in successful!',
+        ]);
     }
 }
