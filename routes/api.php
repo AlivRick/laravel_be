@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VnpayController;
 use App\Http\Controllers\BookingController;
-
+use App\Http\Controllers\SeatTemplateController;
 Route::group(['middleware' => ['force.json', 'api']], function () {
     require __DIR__ . '/auth.php';
     require __DIR__ . '/genres.php';
@@ -72,3 +72,9 @@ Route::group(['middleware' => ['force.json', 'api']], function () {
 //         Route::delete('/{id}', [MovieController::class, 'destroy']);
 //     });
 // });
+Route::prefix('cinema-complexes/{complexId}/rooms/{roomId}')->group(function () {
+    Route::get('/check-design', [SeatTemplateController::class, 'checkRoomDesign']);
+    Route::put('/template', [SeatTemplateController::class, 'updateTemplate']);
+    Route::put('/seats', [SeatTemplateController::class, 'updateSeats']);
+    Route::get('/seats', [SeatTemplateController::class, 'getSeats']);
+});
