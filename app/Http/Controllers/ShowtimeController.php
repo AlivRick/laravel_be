@@ -187,33 +187,31 @@ class ShowtimeController extends Controller
 
     public function getShowtimeSeats($showtimeId)
     {
-        $showtime = Showtime::with(['seats.seat.row'])->findOrFail($showtimeId);
-        $rows = $showtime->seats->groupBy('seat.row_id')->map(function ($seats) {
-            $row = $seats->first()->seat->row;
-            return [
-                'rowname' => $row->rowname,
-                'rowseats' => $seats->map(function ($showtimeSeat) {
-                    $seat = $showtimeSeat->seat;
-                    $isReserved = ShowtimeSeat::isSeatReserved($showtimeSeat->showtime_id, $seat->id);
-                    return [
-                        'seat_type' => $seat->seat_type,
-                        'ticketid' => $seat->ticketid,
-                        'price' => $seat->price,
-                        'isseat' => $seat->isseat,
-                        'name' => $seat->name,
-                        'isoff' => $seat->isoff,
-                        'issold' => $showtimeSeat->is_booked || $isReserved,
-                        'colindex' => $seat->colindex,
-                        'seatindex' => $seat->seatindex,
-                        'tickettypeid' => $seat->tickettypeid,
-                    ];
-                })->toArray(),
-                'maxcolumn' => $row->maxcolumn,
-            ];
-        });
+        $showtime = Showtime::with(['showtimeSeats.seat'])->findOrFail($showtimeId);
+        $rows = $showtime->showtimeSeats->groupBy('seat.seat_row')->map(function ($seats) {
+        $rowname = $seats->first()->seat->seat_row; // row_id hoặc row_name
 
-        return response()->json(['data' => $rows->values()]);
-    }
+        return [
+            'rowname' => $rowname,
+            'rowseats' => $seats->map(function ($showtimeSeat) {
+                $seat = $showtimeSeat->seat;
+                $isReserved = ShowtimeSeat::isSeatReserved($showtimeSeat->showtime_id, $seat->seat_id);
+
+                return [
+                    'seat_type' => $seat->seat_type,
+                    'isseat' => true, // nếu muốn check isseat thì kiểm tra thêm is_active / is_available
+                    'isoff' => !$seat->is_active,
+                    'name' => $seat->seat_number,
+                    'issold' => $showtimeSeat->is_booked || $isReserved,
+                    'colindex' => null, // nếu có thì lấy, không thì bỏ
+                    'seatindex' => null, // nếu có thì lấy, không thì bỏ
+                ];
+            })->toArray(),
+        ];
+    });
+
+    return response()->json(['data' => $rows->values()]);
+}
 
     public function reserveSeats(Request $request, $showtimeId)
 {

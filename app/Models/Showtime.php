@@ -1,9 +1,11 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\GeneratesId;
+
 class Showtime extends Model
 {
     use HasFactory, GeneratesId;
@@ -47,4 +49,9 @@ class Showtime extends Model
     {
         return $this->hasMany(BookingDetail::class, 'showtime_id', 'showtime_id');
     }
+
+    public function showtimeSeats()
+{
+    return $this->hasMany(ShowtimeSeat::class, 'showtime_id');
+}
 }

@@ -97,6 +97,8 @@ class BookingController extends Controller
             ShowtimeSeat::where('showtime_id', $detail['showtime_id'])
                 ->where('seat_id', $detail['seat_id'])
                 ->update(['is_booked' => true]);
+            // Reserve the seat in cache
+            ShowtimeSeat::releaseSeat($detail['showtime_id'], $detail['seat_id']);
         }
 
         PaymentHistory::create([
@@ -106,7 +108,7 @@ class BookingController extends Controller
             'payment_time' => now(),
             'payment_status' => $booking->payment_status,
         ]);
-
+        
         return $this->createSuccessResponse(
             $booking->load(['user', 'paymentMethod', 'bookingDetails', 'concessions']),
             201
