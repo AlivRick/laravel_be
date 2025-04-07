@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VnpayController;
 
 
 Route::group(['middleware' => ['force.json', 'api']], function () {
@@ -20,7 +21,8 @@ Route::group(['middleware' => ['force.json', 'api']], function () {
     require __DIR__ . '/promotions.php';
     require __DIR__ . '/user_promotions.php';
     require __DIR__ . '/roles.php';
-    
+    require __DIR__ . '/vnpay.php';
+    Route::get('/vnpay/return', [VnpayController::class, 'return']);
 });
 
 // Route::group(['middleware' => 'api'], function () {
