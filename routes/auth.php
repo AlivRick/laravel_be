@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Middleware\JwtMiddleware;
 
 // Public routes - không cần authentication
+Route::post('google-login', [AuthController::class, 'googleLogin']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 

@@ -10,6 +10,7 @@ use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiResponse;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -28,7 +29,7 @@ class AuthController extends Controller
             'user' => Auth::user(),
             'token' => $token
         ]);
-        
+
         return $this->createCookieResponse(
             $response,
             'token',
@@ -47,7 +48,7 @@ class AuthController extends Controller
         Auth::logout();
         return $this->createSuccessResponse(['message' => 'Successfully logged out']);
     }
-    
+
     public function register(Request $request)
     {
         try {
@@ -78,13 +79,13 @@ class AuthController extends Controller
             $user->save();
 
             $token = Auth::login($user);
-            
+
             // Create cookie response
             $response = $this->createSuccessResponse([
                 'user' => $user,
                 'token' => $token
             ]);
-            
+
             return $this->createCookieResponse(
                 $response,
                 'token',
@@ -100,17 +101,17 @@ class AuthController extends Controller
     {
         try {
             $token = Auth::refresh();
-            
+
             if (!$token) {
                 return $this->createErrorResponse('Could not refresh token', 401);
             }
-            
+
             // Create cookie response
             $response = $this->createSuccessResponse([
                 'user' => Auth::user(),
                 'token' => $token
             ]);
-            
+
             return $this->createCookieResponse(
                 $response,
                 'token',
@@ -119,6 +120,56 @@ class AuthController extends Controller
             );
         } catch (\Exception $e) {
             return $this->createErrorResponse($e->getMessage(), 401);
+        }
+    }
+
+
+    public function googleLogin(Request $request)
+    {
+
+        $validated = $request->validate([
+            'token' => 'required|string', // id_token từ FE gửi
+        ]);
+
+        try {
+
+            /** @var \Laravel\Socialite\Contracts\Provider|\Laravel\Socialite\Two\AbstractProvider $googleProvider */
+            $googleProvider = Socialite::driver('google');
+
+            $googleUser = $googleProvider->stateless()->userFromToken($validated['token']);
+
+            // Kiểm tra user tồn tại chưa
+            $user = User::where('email', $googleUser->getEmail())->first();
+
+            if (!$user) {
+                // Tạo user mới
+                $role = Role::where('role_name', 'User')->first();
+
+                $user = User::create([
+                    'username' => explode('@', $googleUser->getEmail())[0],
+                    'email' => $googleUser->getEmail(),
+                    'password' => bcrypt(uniqid()), // password random
+                    'full_name' => $googleUser->getName() ?? 'User',
+                    'role_id' => $role->role_id,
+                    'is_active' => true,
+                ]);
+            }
+
+            $token = Auth::login($user);
+
+            $response = $this->createSuccessResponse([
+                'user' => $user,
+                'token' => $token,
+            ]);
+
+            return $this->createCookieResponse(
+                $response,
+                'token',
+                $token,
+                60
+            );
+        } catch (\Exception $e) {
+            return $this->createErrorResponse($e->getMessage(), 500);
         }
     }
 }
